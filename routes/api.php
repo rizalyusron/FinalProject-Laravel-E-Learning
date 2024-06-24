@@ -11,23 +11,23 @@ use App\Http\Controllers\LessonController;
  * route "/register"
  * @method "POST"
  */
-Route::post('/register', App\Http\Controllers\api\RegisterController::class)->name('register');
+Route::post('/register', App\Http\Controllers\api\RegisterController::class)->name('register')->middleware('throttle:10,1');//throttle untuk membatasi API Request
 
 // Route::get('/course', App\Http\Controllers\api\RegisterController::class)->name('register');
 /**
  * route "/login"
  * @method "POST"
  */
-Route::post('/login', App\Http\Controllers\api\LoginController::class)->name('login');
+Route::post('/login', App\Http\Controllers\api\LoginController::class)->name('login')->middleware('throttle:5,1');
 /**
  * route "/user"
  * @method "GET"
  */
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+Route::middleware(['auth:api', 'throttle:60,1'])->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['middleware' => ['auth:api']], function () {
+Route::group(['middleware' => ['auth:api','throttle:60,1']], function () {
     Route::get('courses', [CourseController::class, 'index']);
     Route::post('courses', [CourseController::class, 'store']);
     Route::get('courses/{id}', [CourseController::class, 'show']);
